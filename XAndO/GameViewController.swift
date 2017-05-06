@@ -10,6 +10,8 @@ import UIKit
 
 class GameViewController: UIViewController {
 
+    //MARK: - View lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -19,6 +21,8 @@ class GameViewController: UIViewController {
         self.createGameView()
     }
 
+    //MARK: - Create views
+    
     func changeBackgroundColor(){
         // self.view is a property of UiViewController
         // .backgroundColor is a property of UiView
@@ -104,11 +108,19 @@ class GameViewController: UIViewController {
         resetButton.setTitle("Reset", for: .normal)
         resetButton.setTitleColor(UIColor.black, for: .normal)
         resetButton.setTitleColor(UIColor.blue, for: .highlighted)
-        //layer (contur) pt buton
+        /*
+        ADD BORDER RADIUS
+        */
         resetButton.layer.borderWidth = 1.0
         resetButton.layer.borderColor = UIColor.black.cgColor
-        //layer (corner redius) pt buton
+        /*
+        ADD CORNER RADIUS
+        */
         resetButton.layer.cornerRadius = 25.0
+        /*
+        ADD TARGET TO BUTTON (SELECTOR)
+        */
+        resetButton.addTarget(self, action: #selector(GameViewController.resetGame), for: .touchUpInside)
         
         containerView.addSubview(resetButton)
     }
@@ -147,5 +159,11 @@ class GameViewController: UIViewController {
         //let cell = tableView.dequeueReusableCell(withIdentifier: "cell")
         
         containerView.addSubview(tableView)
+    }
+    
+    //MARK: - Button Actions
+    
+    func resetGame(){
+        print("Want to reset the game")
     }
 }
