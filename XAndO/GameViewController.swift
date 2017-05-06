@@ -96,14 +96,20 @@ class GameViewController: UIViewController {
 //        containerView.addSubview(imageView)
         
         //reset button
-        let resetButton = UIButton(frame: CGRect(x: screenSize.width - 100,
-                                                 y: screenSize.height * 0.4 - 50,
-                                                 width: 80,
-                                                 height: 30)
+        let resetButton = UIButton(frame: CGRect(x: containerView.frame.size.width - 100,
+                                                 y: containerView.frame.size.height - 60,
+                                                 width: 50,
+                                                 height: 50)
         )
         resetButton.setTitle("Reset", for: .normal)
-        resetButton.setTitleColor(UIColor.blue, for: .normal)
-        resetButton.addTarget(self, action:#selector(reset), for: .touchUpInside)
+        resetButton.setTitleColor(UIColor.black, for: .normal)
+        resetButton.setTitleColor(UIColor.blue, for: .highlighted)
+        //layer (contur) pt buton
+        resetButton.layer.borderWidth = 1.0
+        resetButton.layer.borderColor = UIColor.black.cgColor
+        //layer (corner redius) pt buton
+        resetButton.layer.cornerRadius = 25.0
+        
         containerView.addSubview(resetButton)
     }
     
@@ -141,12 +147,5 @@ class GameViewController: UIViewController {
         //let cell = tableView.dequeueReusableCell(withIdentifier: "cell")
         
         containerView.addSubview(tableView)
-    }
-    
-    func reset(param1: UILabel){
-        let label = param1
-        if label.text == "vs" {
-            label.text = "reset"
-        }
     }
 }
