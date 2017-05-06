@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
     var screenWidth: CGFloat = 0.0
     var screenHeight: CGFloat = 0.0
     var numberOfTotalTurns = 0
-    var gameButtons : Array<UIButton> = Array<UIButton>()
+    var gameButtons : Array<UIButton> = []
     //MARK: - View lifecycle
     
     override func viewDidLoad() {
@@ -30,6 +30,7 @@ class GameViewController: UIViewController {
     }
     
     func initialize() {
+        // init for width and height
         self.screenWidth = self.view.frame.size.width
         self.screenHeight = self.view.frame.size.height
     }
@@ -101,12 +102,6 @@ class GameViewController: UIViewController {
         imageView.image = UIImage(named: "Logo")
         containerView.addSubview(imageView)
         
-//        let imageName = "image1.jpg"
-//        let image = UIImage(named: imageName)
-//        let imageView = UIImageView(image: image!)
-//        imageView.frame = CGRect(x: 125, y: 0, width: 400, height: 200)
-//        containerView.addSubview(imageView)
-        
         //reset button
         let resetButton = UIButton(frame: CGRect(x: screenWidth - 100,
                                                  y: screenHeight * 0.4 - 60,
@@ -163,6 +158,9 @@ class GameViewController: UIViewController {
         
         // delete previous buttons if available
         if container.subviews.count > 0 {
+            // remove all buttons from the game buttons array
+            self.gameButtons = Array<UIButton>()
+            // remove all buttons from the list of subviews
             for button in container.subviews {
                 button.removeFromSuperview()
             }
@@ -174,8 +172,8 @@ class GameViewController: UIViewController {
         
         for i in 0...2{
             for j in 0...2{
-                let button = UIButton(frame: CGRect(x: buttonWidth * CGFloat(i),
-                                                    y: buttonHeight * CGFloat(j),
+                let button = UIButton(frame: CGRect(x: buttonWidth * CGFloat(j),
+                                                    y: buttonHeight * CGFloat(i),
                                                     width: buttonWidth,
                                                     height: buttonHeight)
                 )
@@ -185,14 +183,15 @@ class GameViewController: UIViewController {
                 
                 button.addTarget(self, action: #selector(GameViewController.addGameValue(sender:)), for: .touchUpInside)
                 
-                button.tag = i + j * 3
-                
+                button.tag = i * 3 + j
                 self.gameButtons.append(button)
                 container.addSubview(button)
             }
         }
         
-        
+        for button in self.gameButtons{
+            print(button.tag)
+        }
     }
     
     //MARK: - Button Actions
@@ -239,6 +238,16 @@ class GameViewController: UIViewController {
             }
         }
         
-        print("GAME OVER!")
+        for k in 0...2 {
+            if (gameButtons[k].currentTitle == gameButtons[k + 1].currentTitle
+                && gameButtons[k + 1].currentTitle == gameButtons[k + 2].currentTitle
+                && gameButtons[k].currentTitle == gameButtons[k + 2].currentTitle
+                ){
+                print("=== " + gameButtons[k].currentTitle! + " WON === LINE " + k + " ===")
+                return
+            }
+        }
+        
+        print("GAME OVER! === TIE ===")
     }
 }
