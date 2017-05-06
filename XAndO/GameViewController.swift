@@ -14,7 +14,7 @@ class GameViewController: UIViewController {
     
     // Dimensiuni relative la ecran
     var screenWidth: CGFloat = 0.0
-    var screenHeight: CGFloat = 0.0    
+    var screenHeight: CGFloat = 0.0
     
     //MARK: - View lifecycle
     
@@ -149,7 +149,7 @@ class GameViewController: UIViewController {
         
         self.view.addSubview(containerView)
         
-        self.createGridView(containerView: containerView)
+        self.createGridView(container: containerView)
     }
     
     /**
@@ -158,8 +158,17 @@ class GameViewController: UIViewController {
      * the parameter containerView is of type UIView
      * the value of the parameter id received from the above method createGameView
      */
-    func createGridView(containerView: UIView){
-        //let button = UIButton()
+    func createGridView(container: UIView){
+        let buttonWidth = container.frame.size.width/3
+        let buttonHeight = container.frame.size.height/3
+        
+        let button = UIButton(frame: CGRect(x: 0,
+                                            y: 0,
+                                            width: buttonWidth,
+                                            height: buttonHeight)
+            )
+        button.backgroundColor = UIColor.init(colorLiteralRed: 0.1, green: 1, blue: 0.05, alpha: 1)
+        container.addSubview(button)
     }
     
     //MARK: - Button Actions
