@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
     var screenWidth: CGFloat = 0.0
     var screenHeight: CGFloat = 0.0
     var numberOfTotalTurns = 0
-    
+    var gameButtons : Array<UIButton> = Array<UIButton>()
     //MARK: - View lifecycle
     
     override func viewDidLoad() {
@@ -187,6 +187,7 @@ class GameViewController: UIViewController {
                 
                 button.tag = i + j * 3
                 
+                self.gameButtons.append(button)
                 container.addSubview(button)
             }
         }
@@ -215,6 +216,8 @@ class GameViewController: UIViewController {
             sender.setTitle(getToken(), for: .normal)
             self.numberOfTotalTurns += 1
         }
+        
+        self.showWinner()
     }
     
     func getToken() -> String {
@@ -226,5 +229,16 @@ class GameViewController: UIViewController {
         {
             return "O"
         }
+    }
+    
+    func showWinner(){
+        for button in self.gameButtons{
+            if (button.currentTitle != "X" && button.currentTitle != "O")
+            {
+                return
+            }
+        }
+        
+        print("GAME OVER!")
     }
 }
