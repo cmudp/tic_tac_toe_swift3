@@ -10,15 +10,28 @@ import UIKit
 
 class GameViewController: UIViewController {
 
+    //MARK: - Properties/Constants
+    
+    // Dimensiuni relative la ecran
+    var screenWidth: CGFloat = 0.0
+    var screenHeight: CGFloat = 0.0
+    
+    
     //MARK: - View lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        self.initialize()
         self.changeBackgroundColor()
         self.createScoreView()
         self.createGameView()
+    }
+    
+    func initialize() {
+        self.screenWidth = self.view.frame.size.width
+        self.screenHeight = self.view.frame.size.height
     }
 
     //MARK: - Create views
@@ -35,15 +48,10 @@ class GameViewController: UIViewController {
         let containerView = UIView()
         
         // CG is core graphics and Rect is rectangle
-//        containerView.frame = CGRect(x: 0,
-//                            y: 60,
-//                            width: 300,
-//                            height: 200)
-        let screenSize = self.view.frame.size
         containerView.frame = CGRect(x: 0,
                                      y: 0,
-                                     width: screenSize.width,
-                                     height: screenSize.height * 0.4)
+                                     width: self.screenWidth,
+                                     height: self.screenHeight * 0.4)
         
         containerView.backgroundColor = UIColor(red: 0.95,
                                        green: 0.86,
@@ -86,7 +94,7 @@ class GameViewController: UIViewController {
         //logo
         let imageWidth = CGFloat(239.0)
         let imageHeight = CGFloat(160.0)
-        let imageView = UIImageView(frame: CGRect(x: screenSize.width - imageWidth - 10,
+        let imageView = UIImageView(frame: CGRect(x: screenWidth - imageWidth - 10,
                                                   y: 30,
                                                   width: imageWidth,
                                                   height: imageHeight))
@@ -100,8 +108,8 @@ class GameViewController: UIViewController {
 //        containerView.addSubview(imageView)
         
         //reset button
-        let resetButton = UIButton(frame: CGRect(x: containerView.frame.size.width - 100,
-                                                 y: containerView.frame.size.height - 60,
+        let resetButton = UIButton(frame: CGRect(x: screenWidth - 100,
+                                                 y: screenHeight * 0.4 - 60,
                                                  width: 50,
                                                  height: 50)
         )
@@ -130,11 +138,10 @@ class GameViewController: UIViewController {
         // UI from UIKit
         let containerView = UIView()
         
-        let screenSize = self.view.frame.size
         containerView.frame = CGRect(x: 0,
-                                     y: 2 + screenSize.height * 0.4,
-                                     width: screenSize.width,
-                                     height: screenSize.height * 0.6 - 2)
+                                     y: 2 + screenHeight * 0.4,
+                                     width: screenWidth,
+                                     height: screenHeight * 0.6 - 2)
         
         containerView.backgroundColor = UIColor(red: 0.95,
                                                 green: 0.05,
@@ -143,22 +150,17 @@ class GameViewController: UIViewController {
         
         self.view.addSubview(containerView)
         
-        
-        //add 3x3 matrix of buttons
-        let table = UITableViewController()
-        
-        let tableView = UITableView();
-        tableView.frame = CGRect(x: 10,
-                                 y: 10,
-                                 width: screenSize.width - 20,
-                                 height: screenSize.height * 0.6 - 20
-        )
-        tableView.dataSource = table
-        tableView.delegate = table
-        tableView.numberOfRows(inSection: 3)
-        //let cell = tableView.dequeueReusableCell(withIdentifier: "cell")
-        
-        containerView.addSubview(tableView)
+        self.createGridView(containerView: containerView)
+    }
+    
+    /**
+     * createGridView is a method of the class GameViewController
+     * createGRidView has only one parameter named containerView
+     * the parameter containerView is of type UIView
+     * the value of the parameter id received from the above method createGameView
+     */
+    func createGridView(containerView: UIView){
+        //let button = UIButton()
     }
     
     //MARK: - Button Actions
