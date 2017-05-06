@@ -15,6 +15,7 @@ class GameViewController: UIViewController {
     // Dimensiuni relative la ecran
     var screenWidth: CGFloat = 0.0
     var screenHeight: CGFloat = 0.0
+    var numberOfTotalTurns = 0
     
     //MARK: - View lifecycle
     
@@ -159,21 +160,71 @@ class GameViewController: UIViewController {
      * the value of the parameter id received from the above method createGameView
      */
     func createGridView(container: UIView){
+        
+        // delete previous buttons if available
+        if container.subviews.count > 0 {
+            for button in container.subviews {
+                button.removeFromSuperview()
+            }
+        }
+        
+        
         let buttonWidth = container.frame.size.width/3
         let buttonHeight = container.frame.size.height/3
         
-        let button = UIButton(frame: CGRect(x: 0,
-                                            y: 0,
-                                            width: buttonWidth,
-                                            height: buttonHeight)
-            )
-        button.backgroundColor = UIColor.init(colorLiteralRed: 0.1, green: 1, blue: 0.05, alpha: 1)
-        container.addSubview(button)
+        for i in 0...2{
+            for j in 0...2{
+                let button = UIButton(frame: CGRect(x: buttonWidth * CGFloat(i),
+                                                    y: buttonHeight * CGFloat(j),
+                                                    width: buttonWidth,
+                                                    height: buttonHeight)
+                )
+                button.backgroundColor = UIColor.init(colorLiteralRed: 0.1, green: 1, blue: 0.05, alpha: 1)
+                button.layer.borderWidth = 1.0
+                button.layer.borderColor = UIColor.black.cgColor
+                
+                button.addTarget(self, action: #selector(GameViewController.addGameValue(sender:)), for: .touchUpInside)
+                
+                button.tag = i + j * 3
+                
+                container.addSubview(button)
+            }
+        }
+        
+        
     }
     
     //MARK: - Button Actions
     
     func resetGame(){
         print("Want to reset the game")
+        createGameView()
+        self.numberOfTotalTurns = 0
+    }
+    
+    func addGameValue(sender: UIButton){
+        print(sender.tag)
+        if (sender.currentTitle == "X" || sender.currentTitle == "O")
+        {
+            sender.backgroundColor = UIColor.white
+            sender.setTitle("-", for: .normal)
+            self.numberOfTotalTurns -= 1
+        }
+        else{
+            sender.backgroundColor = UIColor.blue
+            sender.setTitle(getToken(), for: .normal)
+            self.numberOfTotalTurns += 1
+        }
+    }
+    
+    func getToken() -> String {
+        if self.numberOfTotalTurns % 2 == 0
+        {
+            return "X"
+        }
+        else
+        {
+            return "O"
+        }
     }
 }
