@@ -14,8 +14,7 @@ class GameViewController: UIViewController {
     
     // Dimensiuni relative la ecran
     var screenWidth: CGFloat = 0.0
-    var screenHeight: CGFloat = 0.0
-    
+    var screenHeight: CGFloat = 0.0    
     
     //MARK: - View lifecycle
     
