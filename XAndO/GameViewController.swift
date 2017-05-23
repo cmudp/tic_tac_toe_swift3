@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
     var screenWidth: CGFloat = 0.0
     var screenHeight: CGFloat = 0.0
     var numberOfTotalTurns = 0
-    var gameButtons : Array<UIButton> = []
+    var gameButtons = [UIButton]()
     //MARK: - View lifecycle
     
     override func viewDidLoad() {
@@ -159,7 +159,12 @@ class GameViewController: UIViewController {
         // delete previous buttons if available
         if container.subviews.count > 0 {
             // remove all buttons from the game buttons array
-            self.gameButtons = Array<UIButton>()
+            if gameButtons.isEmpty {
+                print("Before reseting Grid View button-list is empty.")
+            } else {
+                print("Before reseting Grid View button-list is not empty.")
+            }
+            self.gameButtons = []
             // remove all buttons from the list of subviews
             for button in container.subviews {
                 button.removeFromSuperview()
@@ -180,6 +185,7 @@ class GameViewController: UIViewController {
                 button.backgroundColor = UIColor.init(colorLiteralRed: 0.1, green: 1, blue: 0.05, alpha: 1)
                 button.layer.borderWidth = 1.0
                 button.layer.borderColor = UIColor.black.cgColor
+                button.setTitle("-", for: .normal)
                 
                 button.addTarget(self, action: #selector(GameViewController.addGameValue(sender:)), for: .touchUpInside)
                 
@@ -189,8 +195,10 @@ class GameViewController: UIViewController {
             }
         }
         
-        for button in self.gameButtons{
-            print(button.tag)
+        if gameButtons.isEmpty {
+            print("Before reseting Grid View button-list is empty.")
+        } else {
+            print("Before reseting Grid View button-list is not empty.")
         }
     }
     
@@ -203,7 +211,6 @@ class GameViewController: UIViewController {
     }
     
     func addGameValue(sender: UIButton){
-        print(sender.tag)
         if (sender.currentTitle == "X" || sender.currentTitle == "O")
         {
             sender.backgroundColor = UIColor.white
@@ -211,12 +218,13 @@ class GameViewController: UIViewController {
             self.numberOfTotalTurns -= 1
         }
         else{
+            let token = getToken()
             sender.backgroundColor = UIColor.blue
-            sender.setTitle(getToken(), for: .normal)
+            sender.setTitle(token, for: .normal)
+            gameButtons[sender.tag].setTitle(token, for: .normal)
+            self.showWinner(tag: Int(sender.tag))
             self.numberOfTotalTurns += 1
         }
-        
-        self.showWinner()
     }
     
     func getToken() -> String {
@@ -230,7 +238,80 @@ class GameViewController: UIViewController {
         }
     }
     
-    func showWinner(){
+    // Check end condition
+    func showWinner(tag: Int){
+        // init
+        let currentButton = gameButtons[tag]
+        print("#######" + currentButton.currentTitle!)
+        // column number is 0 if TAG in [0,2], 1 if TAG in [3,5] and 2 if TAG in [6,8]
+        var columnIndex = 0
+        switch tag {
+        case 3:
+            columnIndex = 1
+        case 4:
+            columnIndex = 1
+        case 5:
+            columnIndex = 1
+            break
+        case 6:
+            columnIndex = 2
+        case 7:
+            columnIndex = 2
+        case 8:
+            columnIndex = 2
+            break
+        default:
+            columnIndex = 0
+        }
+        // line number is 0 if TAG in [0,3,6], 1 if TAG in [1, 4, 7] and 2 if TAG in [2, 5, 8]
+        let lineIndex = Int(tag) / 3
+        let token = getToken()
+        
+        // 1. check column
+        for k in 0...2 {
+            print(gameButtons[columnIndex + k].tag)
+            let currentTitle = gameButtons[columnIndex + k].currentTitle
+            if( currentTitle != token){
+                //print("MISSED:::::   : " + currentTitle! + " <> " + token + " @C" + String(columnIndex))
+                break
+            }
+            else{
+                //print("FOUND:::::   : " + currentTitle! + " == " + token + " @C " + String(columnIndex))
+            }
+            if(k == 2)
+            {
+                print("GAME OVER! === " + token + " WON! ===" + " @C " + String(columnIndex))
+                resetGame()
+                return
+            }
+        }
+        
+        // 2. check line
+        for k in 0...2 {
+            print(gameButtons[3*k + lineIndex].tag)
+            let currentTitle = gameButtons[3*k + lineIndex].currentTitle
+            if(currentTitle != token){
+                //print("MISSED:::::   : " + currentTitle! + " <> " + token + " @L " + String(lineIndex))
+                break
+            }
+            else{
+                //print("FOUND:::::   : " + currentTitle! + " == " + token + " @L " + String(lineIndex))
+            }
+            if(k == 2)
+            {
+                print("GAME OVER! === " + token + " WON! ===" + " @L" + String(lineIndex))
+                resetGame()
+                return
+            }
+        }
+        
+        // 3. check diagonals
+        
+        // 4. check anti diagonals
+        
+        // 5. check tie / draw
+        // "draw or tie is to finish a competition with identical or inconclusive results" - https://en.wikipedia.org/wiki/Tie_(draw)
+        
         for button in self.gameButtons{
             if (button.currentTitle != "X" && button.currentTitle != "O")
             {
@@ -243,7 +324,7 @@ class GameViewController: UIViewController {
                 && gameButtons[k + 1].currentTitle == gameButtons[k + 2].currentTitle
                 && gameButtons[k].currentTitle == gameButtons[k + 2].currentTitle
                 ){
-                print("=== " + gameButtons[k].currentTitle! + " WON === LINE " + k + " ===")
+                //print("=== " + gameButtons[k].currentTitle! + " WON === LINE " + k + " ===")
                 return
             }
         }
