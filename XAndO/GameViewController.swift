@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
     var screenWidth: CGFloat = 0.0
     var screenHeight: CGFloat = 0.0
     var numberOfTotalTurns = 0
-    var gameButtons = [UIButton]()
+    var tags =  [Int: String]()
     //MARK: - View lifecycle
     
     override func viewDidLoad() {
@@ -33,6 +33,9 @@ class GameViewController: UIViewController {
         // init for width and height
         self.screenWidth = self.view.frame.size.width
         self.screenHeight = self.view.frame.size.height
+        for k in 0...8 {
+            self.tags[k] = ""
+        }
     }
 
     //MARK: - Create views
@@ -155,16 +158,13 @@ class GameViewController: UIViewController {
      * the value of the parameter id received from the above method createGameView
      */
     func createGridView(container: UIView){
+        // remove all button tags from the game button tags array
+        for k in 0...8 {
+            self.tags[k] = ""
+        }
         
         // delete previous buttons if available
         if container.subviews.count > 0 {
-            // remove all buttons from the game buttons array
-            if gameButtons.isEmpty {
-                print("Before reseting Grid View button-list is empty.")
-            } else {
-                print("Before reseting Grid View button-list is not empty.")
-            }
-            self.gameButtons = []
             // remove all buttons from the list of subviews
             for button in container.subviews {
                 button.removeFromSuperview()
@@ -185,45 +185,80 @@ class GameViewController: UIViewController {
                 button.backgroundColor = UIColor.init(colorLiteralRed: 0.1, green: 1, blue: 0.05, alpha: 1)
                 button.layer.borderWidth = 1.0
                 button.layer.borderColor = UIColor.black.cgColor
-                button.setTitle("-", for: .normal)
+                button.setTitle("", for: .normal)
                 
                 button.addTarget(self, action: #selector(GameViewController.addGameValue(sender:)), for: .touchUpInside)
                 
                 button.tag = i * 3 + j
-                self.gameButtons.append(button)
+                //self.gameButtons.append(button)
                 container.addSubview(button)
             }
-        }
-        
-        if gameButtons.isEmpty {
-            print("Before reseting Grid View button-list is empty.")
-        } else {
-            print("Before reseting Grid View button-list is not empty.")
         }
     }
     
     //MARK: - Button Actions
     
     func resetGame(){
-        print("Want to reset the game")
+        print("GAME RESET")
         createGameView()
         self.numberOfTotalTurns = 0
     }
     
-    func addGameValue(sender: UIButton){
-        if (sender.currentTitle == "X" || sender.currentTitle == "O")
-        {
-            sender.backgroundColor = UIColor.white
-            sender.setTitle("-", for: .normal)
-            self.numberOfTotalTurns -= 1
+    func getRowIndex(tag: Int) -> Int{
+        // line number is 0 if TAG in [0,2], 1 if TAG in [3,5] and 2 if TAG in [6,8]
+        var lineIndex = 0
+        switch tag {
+        case 3:
+            lineIndex = 1
+        case 4:
+            lineIndex = 1
+        case 5:
+            lineIndex = 1
+            break
+        case 6:
+            lineIndex = 2
+        case 7:
+            lineIndex = 2
+        case 8:
+            lineIndex = 2
+            break
+        default:
+            lineIndex = 0
         }
-        else{
+
+        return lineIndex
+    }
+    
+    func getColumnIndex(tag: Int) -> Int{
+        // column number is 0 if TAG in [0,3,6], 1 if TAG in [1, 4, 7] and 2 if TAG in [2, 5, 8]
+        
+        return Int(tag) % 3
+    }
+    
+    func addGameValue(sender: UIButton){
+        let currentTag = sender.tag
+        if (self.tags[currentTag] == "")
+        {
             let token = getToken()
+            self.tags[sender.tag] = token
+            
             sender.backgroundColor = UIColor.blue
             sender.setTitle(token, for: .normal)
-            gameButtons[sender.tag].setTitle(token, for: .normal)
-            self.showWinner(tag: Int(sender.tag))
-            self.numberOfTotalTurns += 1
+            
+            let rowIndex = getRowIndex(tag: sender.tag)
+            let columnIndex = getColumnIndex(tag: sender.tag)
+            
+            let s1 = "# MOVE " + token + " @tag: " + String(sender.tag)
+            let s2 = "@ R C [" + String(rowIndex)+","+String(columnIndex) + "]"
+            //let s3 = "PREV: " + self.tags[tag]!
+            print(s1 + s2)
+            
+            if(endConditionWasReached(tag: Int(sender.tag)) == false){
+                self.numberOfTotalTurns += 1
+            }
+            else{
+                resetGame() //move this else inside the delegate from alertView!!!
+            }
         }
     }
     
@@ -239,96 +274,111 @@ class GameViewController: UIViewController {
     }
     
     // Check end condition
-    func showWinner(tag: Int){
+    func endConditionWasReached(tag: Int) -> Bool{
+        //#############################################################
         // init
-        let currentButton = gameButtons[tag]
-        print("#######" + currentButton.currentTitle!)
-        // column number is 0 if TAG in [0,2], 1 if TAG in [3,5] and 2 if TAG in [6,8]
-        var columnIndex = 0
-        switch tag {
-        case 3:
-            columnIndex = 1
-        case 4:
-            columnIndex = 1
-        case 5:
-            columnIndex = 1
-            break
-        case 6:
-            columnIndex = 2
-        case 7:
-            columnIndex = 2
-        case 8:
-            columnIndex = 2
-            break
-        default:
-            columnIndex = 0
-        }
-        // line number is 0 if TAG in [0,3,6], 1 if TAG in [1, 4, 7] and 2 if TAG in [2, 5, 8]
-        let lineIndex = Int(tag) / 3
+        
+        let rowIndex = getRowIndex(tag: tag)
+        let columnIndex = getColumnIndex(tag: tag)
         let token = getToken()
-        
-        // 1. check column
+        let s1 = "# MOVE " + token + " @tag: " + String(tag)
+        let s2 = "@ R C [" + String(rowIndex)+","+String(columnIndex) + "]"
+        //let s3 = "PREV: " + self.tags[tag]!
+        print(s1 + s2)
+        //#############################################################
+        // 1. check line
         for k in 0...2 {
-            print(gameButtons[columnIndex + k].tag)
-            let currentTitle = gameButtons[columnIndex + k].currentTitle
+            let currentTag = rowIndex*3 + k
+            //print(String(currentTag))
+            let currentTitle = self.tags[currentTag]
+            
             if( currentTitle != token){
-                //print("MISSED:::::   : " + currentTitle! + " <> " + token + " @C" + String(columnIndex))
                 break
             }
-            else{
-                //print("FOUND:::::   : " + currentTitle! + " == " + token + " @C " + String(columnIndex))
-            }
+            
             if(k == 2)
             {
-                print("GAME OVER! === " + token + " WON! ===" + " @C " + String(columnIndex))
-                resetGame()
-                return
+                showGameResult(result: "GAME OVER! === " + token + " WON! ===" + " @R" + String(rowIndex))
+                return true
             }
         }
-        
-        // 2. check line
+        //#############################################################
+        // 2. check column
         for k in 0...2 {
-            print(gameButtons[3*k + lineIndex].tag)
-            let currentTitle = gameButtons[3*k + lineIndex].currentTitle
+            let currentTag = 3*k + columnIndex
+            //print(String(currentTag))
+            let currentTitle = self.tags[currentTag]
+            
             if(currentTitle != token){
-                //print("MISSED:::::   : " + currentTitle! + " <> " + token + " @L " + String(lineIndex))
                 break
             }
-            else{
-                //print("FOUND:::::   : " + currentTitle! + " == " + token + " @L " + String(lineIndex))
-            }
+
             if(k == 2)
             {
-                print("GAME OVER! === " + token + " WON! ===" + " @L" + String(lineIndex))
-                resetGame()
-                return
+                showGameResult(result: "GAME OVER! === " + token + " WON! ===" + " @C" + String(columnIndex))
+                return true
             }
         }
-        
+        //#############################################################
         // 3. check diagonals
-        
+        if (columnIndex == rowIndex){
+            // the pressed button is on the diagonal
+            for k in 0...2 {
+                let currentTag = k*3 + k
+                //print(String(currentTag))
+                let currentTitle = self.tags[currentTag]
+                if(currentTitle != token){
+                    break
+                }
+                if(k == 2){
+                    showGameResult(result: "GAME OVER! === " + token + " WON! ===" + " @D")
+                    return true
+                }
+            }
+        }
+        //#############################################################
         // 4. check anti diagonals
-        
+        if (columnIndex + rowIndex == 2){
+            // the pressed button is on the anti diagonal
+            for k in 0...2 {
+                let currentTag = k*3 + 2 - k
+                //print(String(currentTag))
+                let currentTitle = self.tags[currentTag]
+                if(currentTitle != token){
+                    break
+                }
+                if(k == 2){
+                    showGameResult(result: "GAME OVER! === " + token + " WON! ===" + " @AD")
+                    return true
+                }
+            }
+        }
+        //#############################################################
         // 5. check tie / draw
         // "draw or tie is to finish a competition with identical or inconclusive results" - https://en.wikipedia.org/wiki/Tie_(draw)
-        
-        for button in self.gameButtons{
-            if (button.currentTitle != "X" && button.currentTitle != "O")
-            {
-                return
+        if(self.numberOfTotalTurns == 9){
+            for tag in self.tags{
+                if (tag.value == "")
+                {
+                    return false
+                }
             }
+            showGameResult(result: "GAME OVER! === TIE ===")
+            return true
         }
         
-        for k in 0...2 {
-            if (gameButtons[k].currentTitle == gameButtons[k + 1].currentTitle
-                && gameButtons[k + 1].currentTitle == gameButtons[k + 2].currentTitle
-                && gameButtons[k].currentTitle == gameButtons[k + 2].currentTitle
-                ){
-                //print("=== " + gameButtons[k].currentTitle! + " WON === LINE " + k + " ===")
-                return
-            }
-        }
+        return false
+    }
+    
+    func showGameResult(result: String)
+    {
+        let alert = UIAlertView(title: "Game result:",
+                                message: result,
+                                delegate: nil,
+                                //delegate: delete(resetGame()),
+                                cancelButtonTitle: "Reset"
+        )
         
-        print("GAME OVER! === TIE ===")
+        alert.show()
     }
 }
